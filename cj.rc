@@ -1,0 +1,26 @@
+# This file must have a valid Python syntax,
+# but if you don't know Python you still can guess how to edit it.
+
+# installation prefix
+prefix = '/opt/ccp4'
+
+# Number of parallel processes (N for make -jN)
+jobs=8
+
+# compilers (defaults are gcc/g++/gfortran)
+os.environ['CC'] = 'gcc-9'
+os.environ['CXX'] = 'g++-9'
+#os.environ['FC'] = 'gfortran-4.8'
+
+# Options for C/C++/Fortran compilers.
+os.environ['CXXFLAGS'] = '-O2 -Wall -Wextra -std=c++11 -fPIC'
+
+# To build static libraries set env. variable BUILD_STATIC before building
+
+module_autogenargs['mmdb'] = '--enable-static --disable-shared'
+module_autogenargs['mmdb2'] = '--enable-static --disable-shared'
+module_autogenargs['fftw2'] = '--enable-static --disable-shared'
+module_autogenargs['ccp4-base'] = '--enable-static --disable-shared'
+module_autogenargs['libccp4'] = '--enable-static --disable-shared'
+module_autogenargs['clipper'] = '--enable-static --disable-shared'
+module_autogenargs['gsl'] = '--enable-static --disable-shared'

@@ -1,0 +1,8 @@
+devtools/checkout/
+!devtools/checkout/libccp4
+!devtools/checkout/ccp4-base
+!devtools/checkout/mmdb2
+!devtools/checkout/clipper
+!devtools/checkout/fftw-2.1.5
+!devtools/checkout/gsl-1.16.tar.gz
+!devtools/checkout/pkgconf-0.9.6.tar.gz

@@ -1,0 +1,15 @@
+FROM gcc:v9.3
+
+WORKDIR /tmp/doss/
+
+# Install Boost
+RUN curl -Lo boost_1_75_0.tar.gz https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.gz && \
+	tar xvf boost_1_75_0.tar.gz
+
+COPY user-config.jam /tmp/doss/boost_1_75_0/
+
+RUN cd boost_1_75_0/ && \
+	./bootstrap.sh && \
+	./b2 link=static --toolset=gcc-9 install --prefix=/opt/boost-1.75 --without-python
+
+RUN rm -rf /tmp/doss

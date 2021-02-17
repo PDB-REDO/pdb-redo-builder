@@ -1,0 +1,33 @@
+FROM pdb-redo-ccp4:v7.1
+
+ENV LDFLAGS=-static-libstdc++
+
+# Install mrc
+RUN git clone https://github.com/mhekkel/mrc.git && cd mrc && ./configure CXX=g++-9 --with-boost=/opt/boost-1.75 && make && make install
+
+# Install libcifpp
+RUN git clone https://github.com/PDB-REDO/libcifpp.git && \
+    cd libcifpp && ./configure CXX=g++-9 --with-boost=/opt/boost-1.75 --enable-resources && make -j $(nproc) && make install
+
+# Install libzeep
+RUN git clone https://github.com/mhekkel/libzeep.git && \
+    cd libzeep && ./configure CXX=g++-9 --with-boost=/opt/boost-1.75 && make -j $(nproc) && make install
+
+# Install libnewuoa
+RUN git clone https://github.com/elsid/newuoa-cpp.git && \
+    cd newuoa-cpp && \
+	g++-9 -o libnewuoa.a -r -fpic -I include src/newuoa.cpp && \
+	install libnewuoa.a /usr/local/lib/libnewuoa.a && \
+	install include/newuoa.h /usr/local/include/
+
+COPY newuoa.pc /usr/local/lib/pkgconfig
+
+ENV CCP4=/opt/ccp4
+
+# Install libpdb-redo
+RUN git clone https://github.com/PDB-REDO/libpdb-redo.git
+COPY components.cif.gz libpdb-redo/data/
+RUN cd libpdb-redo && PKG_CONFIG_PATH=/usr/local/lib/pkgconfig ./configure CXX=g++-9 --with-boost=/opt/boost-1.75 --enable-resources && make -j $(nproc) && make install
+
+# Clean up
+RUN rm -rf /tmp/doss
