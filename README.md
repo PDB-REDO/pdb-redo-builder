@@ -45,6 +45,7 @@ Lets build density-fitness:
 ```
 cd /tmp/
 git clone https://github.com/PDB-REDO/density-fitness.git
+cd density-fitness
 sudo docker run --rm -v $(pwd):/tmp/build pdb-redo-builder:v1
 ```
 This will run a `configure` and `make` sequence generating an executable that can be transferred to a CentOS machine.
