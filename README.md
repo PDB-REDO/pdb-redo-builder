@@ -54,7 +54,7 @@ Please note that the default command assumes you've mounted your local directory
 If you prefer to work on the code interatively, you might want to start the docker container in interactive mode:
 
 ```
-sudo docker run --rm -it $(pwd):/tmp/build pdb-redo-builder:v1
+sudo docker run --rm -it -v $(pwd):/tmp/build pdb-redo-builder:v1
 ```
 
 This will start a session inside the docker container and will mount the density-fitness source directory inside that container. Now it is simply a matter of `configure` and `make`:
