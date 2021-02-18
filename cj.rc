@@ -13,7 +13,7 @@ os.environ['CXX'] = 'g++-9'
 #os.environ['FC'] = 'gfortran-4.8'
 
 # Options for C/C++/Fortran compilers.
-os.environ['CXXFLAGS'] = '-O2 -Wall -Wextra -std=c++11 -fPIC'
+os.environ['CXXFLAGS'] = '-O2 -std=c++11 -fPIC'
 
 # To build static libraries set env. variable BUILD_STATIC before building
 
