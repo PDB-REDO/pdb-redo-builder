@@ -1,5 +1,7 @@
 FROM pdb-redo-builder-base:v1
 
+RUN yum -y install libatomic_ops-devel && yum clean all
+
 ENV LDFLAGS=-static-libstdc++ CXX=g++-9 CCP4=/opt/ccp4 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig CLIBD=$CCP4/lib/data
 
 # Install mrc
@@ -21,6 +23,8 @@ RUN git clone https://github.com/elsid/newuoa-cpp.git && \
 	install include/newuoa.h /usr/local/include/
 
 COPY newuoa.pc /usr/local/lib/pkgconfig
+
+RUN yum -y install gsl-devel && yum clean all
 
 # Install libpdb-redo
 RUN git clone https://github.com/PDB-REDO/libpdb-redo.git

@@ -28,8 +28,8 @@ And put that file, as is, in the same directory.
 Now, the steps to build a docker container are:
 
 ```
-	sudo docker build -t pdb-redo-builder-base:v1 -f Dockerfile.base .
-	sudo docker build -t pdb-redo-builder:v1 -f Dockerfile.build . 
+sudo docker build -t pdb-redo-builder-base:v1 -f Dockerfile.base .
+sudo docker build -t pdb-redo-builder:v1 -f Dockerfile.build . 
 ```
 
 This will first build a decent C++ compiler followed by boost and then the CCP4 libraries that are required by PDB-REDO.
