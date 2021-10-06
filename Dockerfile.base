@@ -3,8 +3,10 @@ FROM centos:7
 # Install compile dependencies
 RUN yum -y update && yum groupinstall -y 'Development Tools'
 
-# Some more compile time dependencies
-RUN yum -y install gcc gcc-c++ zlib-devel bzip2-devel bzip2 wget && yum clean all
+# Some more compile time dependencies, moved other yum actions here too upon request
+RUN yum -y install gcc gcc-c++ zlib-devel bzip2-devel bzip2 wget openssl-devel \
+	libatomic_ops-devel python2 python2-devel && \
+	 yum clean all
 
 WORKDIR /tmp/doss/
 
@@ -34,8 +36,6 @@ RUN cd boost_1_77_0/ && \
 
 # Install a recent cmake
 
-RUN yum -y install openssl-devel && yum clean all
-
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3.tar.gz && \
 	tar xf cmake-3.21.3.tar.gz && \
 	cd cmake-3.21.3 && \
@@ -45,10 +45,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3
 
 # That's done, now move on to building the CCP4 libraries used by PDB-REDO
 
-# First install python2... yeah, right
-RUN yum -y install python2 python2-devel && yum clean all
-
-# Now install CCP4, partially. The .dockerignore file will avoid
+# Install CCP4, partially. The .dockerignore file will avoid
 # the inclusion of too many tools here.
 COPY devtools /tmp/doss/ccp4/
 

@@ -1,7 +1,5 @@
 FROM pdb-redo-builder-base:v1
 
-RUN yum -y install libatomic_ops-devel && yum clean all
-
 ENV LDFLAGS=-static-libstdc++ CXX=g++-9 CCP4=/opt/ccp4 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig CLIBD=$CCP4/lib/data
 
 # Install mrc
