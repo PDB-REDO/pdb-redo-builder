@@ -59,4 +59,4 @@ RUN git clone https://github.com/PDB-REDO/libpdb-redo.git && \
 # Clean up
 RUN rm -rf /tmp/doss
 
-CMD cd /tmpbuild/build && cmake .. && cmake --build .  -j $(nproc)
+CMD cd /tmp/build && mkdir build && cd build && cmake .. && cmake --build .  -j $(nproc)
