@@ -5,33 +5,58 @@ RUN yum -y install libatomic_ops-devel && yum clean all
 ENV LDFLAGS=-static-libstdc++ CXX=g++-9 CCP4=/opt/ccp4 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig CLIBD=$CCP4/lib/data
 
 # Install mrc
-RUN git clone https://github.com/mhekkel/mrc.git && cd mrc && ./configure && make && make install
+RUN git clone https://github.com/mhekkel/mrc.git && \
+	cd mrc && \
+	mkdir build && \
+	cd build && \
+	cmake .. -DCMAKE_CXX_COMPILER=g++-9 && \
+	cmake --build . -j $(nproc) && \
+	ctest . && \
+	cmake --install .
 
 # Install libcifpp
-RUN git clone https://github.com/PDB-REDO/libcifpp.git && \
-    cd libcifpp && ./configure --enable-resources && make -j $(nproc) && make install
+RUN git clone https://github.com/PDB-REDO/libcifpp.git
+RUN cd libcifpp && \
+	mkdir build && \
+	cd build && \
+	cmake .. -DCMAKE_CXX_COMPILER=g++-9 -DCIFPP_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr/local && \
+	cmake --build . -j $(nproc) && \
+	ctest . && \
+	cmake --install .
 
 # Install libzeep
 RUN git clone https://github.com/mhekkel/libzeep.git && \
-    cd libzeep && ./configure && make -j $(nproc) && make install
+	cd libzeep && \
+	mkdir build && \
+	cd build && \
+	cmake .. -DCMAKE_CXX_COMPILER=g++-9 -DZEEP_BUILD_TESTS=ON && \
+	cmake --build . -j $(nproc) && \
+	ctest . && \
+	cmake --install .
 
 # Install libnewuoa
 RUN git clone https://github.com/elsid/newuoa-cpp.git && \
-    cd newuoa-cpp && \
-	g++-9 -o libnewuoa.a -r -fpic -I include src/newuoa.cpp && \
-	install libnewuoa.a /usr/local/lib/libnewuoa.a && \
-	install include/newuoa.h /usr/local/include/
+	cd newuoa-cpp && \
+	mkdir build && \
+	cd build && \
+	sed -e's/ SHARED / STATIC /g' -i.bak ../CMakeLists.txt && \
+	cmake .. && \
+	cmake --build . -j $(nproc) && \
+	cmake --install .
 
 COPY newuoa.pc /usr/local/lib/pkgconfig
 
-RUN yum -y install gsl-devel && yum clean all
-
 # Install libpdb-redo
-RUN git clone https://github.com/PDB-REDO/libpdb-redo.git
-COPY components.cif.gz libpdb-redo/data/
-RUN cd libpdb-redo && ./configure --enable-resources && make -j $(nproc) && make install
+RUN git clone https://github.com/PDB-REDO/libpdb-redo.git && \
+	cd libpdb-redo && \
+	mkdir build && \
+	cd build && \
+	cmake .. -DCMAKE_CXX_COMPILER=g++-9 -DPDB_REDO_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr/local && \
+	cmake --build . -j $(nproc) && \
+	ctest . --output-on-failure && \
+	cmake --install .
 
 # Clean up
 RUN rm -rf /tmp/doss
 
-CMD cd /tmp/build && ./configure --enable-resources && make
+CMD cd /tmpbuild/build && cmake .. && cmake --build .  -j $(nproc)

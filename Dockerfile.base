@@ -22,15 +22,26 @@ RUN GCC_VERSION=9.3.0 ;\
 	make install
 
 # Install Boost
-RUN curl -Lo boost_1_75_0.tar.gz https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.gz && \
-	tar xvf boost_1_75_0.tar.gz
+RUN curl -Lo boost_1_77_0.tar.bz2 https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 && \
+	tar xvf boost_1_77_0.tar.bz2
 
 # Use our own user-config.jam file to make sure the new compiler is used
-COPY user-config.jam /tmp/doss/boost_1_75_0/
+COPY user-config.jam /tmp/doss/boost_1_77_0/
 
-RUN cd boost_1_75_0/ && \
+RUN cd boost_1_77_0/ && \
 	./bootstrap.sh && \
 	./b2 link=static --toolset=gcc-9 install --without-python
+
+# Install a recent cmake
+
+RUN yum -y install openssl-devel && yum clean all
+
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3.tar.gz && \
+	tar xf cmake-3.21.3.tar.gz && \
+	cd cmake-3.21.3 && \
+	./configure && \
+	make && \
+	make install
 
 # That's done, now move on to building the CCP4 libraries used by PDB-REDO
 
