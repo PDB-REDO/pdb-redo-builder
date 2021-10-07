@@ -1,7 +1,7 @@
 PDB-REDO builder
 ================
 
-This is a collection of Dockerfile's that can be used to create pdb-redo executables
+This is a collection of Dockerfiles that can be used to create pdb-redo executables
 that will run on CentOS 7 without any dependency.
 
 They way this works is by creating docker images that can be used to run `configure` and `make`
