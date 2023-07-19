@@ -10,9 +10,9 @@ RUN yum -y install gcc gcc-c++ zlib-devel bzip2-devel bzip2 wget openssl-devel \
 
 WORKDIR /tmp/doss/
 
-# Build a gcc with version GCC_VERSION = 9.3
+# Build a gcc with version GCC_VERSION = 9.4
 # We only need the C++ compiler
-RUN GCC_VERSION=9.3.0 ;\
+RUN GCC_VERSION=9.4.0 ;\
 	wget https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.gz ;\
 	tar xzvf gcc-${GCC_VERSION}.tar.gz ;\
 	mkdir obj.gcc-${GCC_VERSION} ;\
@@ -24,21 +24,21 @@ RUN GCC_VERSION=9.3.0 ;\
 	make install
 
 # Install Boost
-RUN curl -Lo boost_1_77_0.tar.bz2 https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.bz2 && \
-	tar xvf boost_1_77_0.tar.bz2
+RUN curl -Lo boost_1_82_0.tar.bz2 https://boostorg.jfrog.io/artifactory/main/release/1.82.0/source/boost_1_82_0.tar.bz2 && \
+	tar xvf boost_1_82_0.tar.bz2
 
 # Use our own user-config.jam file to make sure the new compiler is used
-COPY user-config.jam /tmp/doss/boost_1_77_0/
+COPY user-config.jam /tmp/doss/boost_1_82_0/
 
-RUN cd boost_1_77_0/ && \
+RUN cd boost_1_82_0/ && \
 	./bootstrap.sh && \
 	./b2 link=static --toolset=gcc-9 install --without-python
 
 # Install a recent cmake
 
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3.tar.gz && \
-	tar xf cmake-3.21.3.tar.gz && \
-	cd cmake-3.21.3 && \
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.22.3/cmake-3.22.3.tar.gz && \
+	tar xf cmake-3.22.3.tar.gz && \
+	cd cmake-3.22.3 && \
 	./configure && \
 	make && \
 	make install

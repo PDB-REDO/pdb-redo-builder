@@ -1,33 +1,67 @@
 FROM pdb-redo-builder-base:v1
 
-ENV LDFLAGS=-static-libstdc++ CXX=g++-9 CCP4=/opt/ccp4 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig CLIBD=$CCP4/lib/data
+RUN yum -y install libatomic_ops-devel xz-devel && yum clean all
+
+ENV LDFLAGS="-static-libgcc -static-libstdc++" CXX=g++-9 CCP4=/opt/ccp4 PKG_CONFIG_PATH=/usr/local/lib/pkgconfig CLIBD=$CCP4/lib/data
+
+# Install libmcfp
+RUN git clone https://github.com/mhekkel/libmcfp &&\
+	cd libmcfp && \
+	mkdir build && \
+	cd build && \
+	cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-9 && \
+	cmake --build . -j $(nproc) && \
+	cmake --install .
 
 # Install mrc
 RUN git clone https://github.com/mhekkel/mrc.git && \
 	cd mrc && \
 	mkdir build && \
 	cd build && \
-	cmake .. -DCMAKE_CXX_COMPILER=g++-9 && \
+	cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-9 && \
 	cmake --build . -j $(nproc) && \
 	ctest . && \
 	cmake --install .
 
-# Install libcifpp
-RUN git clone https://github.com/PDB-REDO/libcifpp.git
-RUN cd libcifpp && \
+# Install gxrio
+RUN git clone https://github.com/mhekkel/gxrio &&\
+	cd gxrio && \
 	mkdir build && \
 	cd build && \
-	cmake .. -DCMAKE_CXX_COMPILER=g++-9 -DCIFPP_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr/local && \
+	cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-9 && \
 	cmake --build . -j $(nproc) && \
-	ctest . && \
 	cmake --install .
+
+# lib eigen3
+RUN git clone https://gitlab.com/libeigen/eigen.git &&\
+	cd eigen && \
+	cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-9 && \
+	cmake --build build -j $(nproc) && \
+	cmake --install build
+
+# Install libcifpp
+RUN git clone https://github.com/PDB-REDO/libcifpp.git &&\
+	cd libcifpp && \
+	git checkout develop && \
+	mkdir build && \
+	cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-9 -DENABLE_TESTING=ON -DCIFPP_DOWNLOAD_CCD=OFF -DCMAKE_INSTALL_PREFIX=/usr/local && \
+	cmake --build build -j $(nproc) && \
+	ctest build && \
+	cmake --install build
+
+# Install Howard Hinnants date library
+RUN git clone https://github.com/HowardHinnant/date.git &&\
+	cd date && \
+	cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-9 && \
+	cmake --build build -j $(nproc) && \
+	cmake --install build
 
 # Install libzeep
 RUN git clone https://github.com/mhekkel/libzeep.git && \
 	cd libzeep && \
 	mkdir build && \
 	cd build && \
-	cmake .. -DCMAKE_CXX_COMPILER=g++-9 -DZEEP_BUILD_TESTS=ON && \
+	cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-9 -DZEEP_BUILD_TESTS=ON && \
 	cmake --build . -j $(nproc) && \
 	ctest . && \
 	cmake --install .
@@ -37,19 +71,18 @@ RUN git clone https://github.com/elsid/newuoa-cpp.git && \
 	cd newuoa-cpp && \
 	mkdir build && \
 	cd build && \
-	sed -e's/ SHARED / STATIC /g' -i.bak ../CMakeLists.txt && \
-	cmake .. && \
+	cmake .. -DCMAKE_BUILD_TYPE=Release && \
 	cmake --build . -j $(nproc) && \
 	cmake --install .
 
-COPY newuoa.pc /usr/local/lib/pkgconfig
+RUN yum -y install gsl-devel && yum clean all
 
 # Install libpdb-redo
 RUN git clone https://github.com/PDB-REDO/libpdb-redo.git && \
 	cd libpdb-redo && \
 	mkdir build && \
 	cd build && \
-	cmake .. -DCMAKE_CXX_COMPILER=g++-9 -DPDB_REDO_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr/local && \
+	cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=g++-9 -DPDB_REDO_BUILD_TESTS=ON -DCMAKE_INSTALL_PREFIX=/usr/local && \
 	cmake --build . -j $(nproc) && \
 	ctest . --output-on-failure && \
 	cmake --install .
@@ -57,4 +90,4 @@ RUN git clone https://github.com/PDB-REDO/libpdb-redo.git && \
 # Clean up
 RUN rm -rf /tmp/doss
 
-CMD cd /tmp/build && mkdir build && cd build && cmake .. && cmake --build .  -j $(nproc)
+CMD cd /tmp/build && mkdir build && cd build && cmake .. -DCMAKE_BUILD_TYPE=Release && cmake --build .  -j $(nproc)
